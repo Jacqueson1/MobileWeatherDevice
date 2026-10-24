@@ -46,8 +46,14 @@ def home(request: Request, location: str = DEFAULT_LOCATION):
             "SELECT location_id, name, type FROM locations WHERE location_id = ?",
             (location,),
         ).fetchone()
-        if current is None:
-            raise HTTPException(status_code=404, detail="Unknown location")
+        if current is None:              # unknown id: fall back to the default
+            location = DEFAULT_LOCATION
+            current = conn.execute(
+                "SELECT location_id, name, type FROM locations WHERE location_id = ?",
+                (location,),
+            ).fetchone()
+            if current is None:          # database is empty
+                raise HTTPException(status_code=404, detail="No locations yet. Run the collector first.")
 
         # Use the most recent snapshot we saved for this location
         fetched_date = conn.execute(
@@ -74,6 +80,7 @@ def home(request: Request, location: str = DEFAULT_LOCATION):
         d = date.fromisoformat(r["forecast_date"])
         bar_left, bar_width = temp_bar(r["min_temp"], r["max_temp"])   # <-- NEW line
         days.append({
+            "date": d,                      # <-- NEW (add inside the days.append({...}) dict)
             "title": day_title(d, today),
             "label": d.strftime("%d %b"),
             "summary": translate(r["summary_forecast"]),
@@ -87,9 +94,14 @@ def home(request: Request, location: str = DEFAULT_LOCATION):
             "bar_width": bar_width,                                    # <-- NEW
         })
 
+    hero = next((x for x in days if x["date"] == today), None)
+    upcoming = [x for x in days if x["date"] > today]
+
     return templates.TemplateResponse(request, "index.html", {
         "locations": locations,
+        "locations_json": [dict(r) for r in locations],   # <-- NEW
         "location": current,
-        "days": days,
+        "hero": hero,
+        "days": upcoming,
         "fetched_date": fetched_date,
     })

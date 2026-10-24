@@ -8,6 +8,15 @@
     <title>Weather Device · {{ location.name }}</title>
     <link rel="stylesheet" href="/static/style.css">
     <script>
+        // Reopen on the last-used location
+        try {
+            var saved = localStorage.getItem('weatherLocation');
+            if (saved && !new URLSearchParams(location.search).has('location')) {
+                location.replace('/?location=' + encodeURIComponent(saved));
+            }
+        } catch (e) { }
+    </script>
+    <script>
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             document.documentElement.classList.add('animate');
         }
@@ -19,21 +28,63 @@
         <header>
             <h1>Weather Device</h1>
             <p class="sub">MET Malaysia forecast, translated</p>
-            <form method="get" action="/">
-                <label for="location">Location</label>
-                <select id="location" name="location" onchange="this.form.submit()">
-                    {% for loc in locations %}
-                    <option value="{{ loc.location_id }}" {% if loc.location_id==location.location_id %}selected{% endif
-                        %}>
-                        {{ loc.name }} ({{ loc.type }})
-                    </option>
-                    {% endfor %}
-                </select>
-            </form>
+
+            <div class="picker" id="picker" data-current-id="{{ location.location_id }}">
+                <label for="picker-input">Location</label>
+                <div class="picker-box">
+                    <input id="picker-input" type="text" autocomplete="off" spellcheck="false" role="combobox"
+                        aria-expanded="false" aria-controls="picker-list"
+                        placeholder="Search {{ locations_json|length }} places…" value="{{ location.name }}">
+                    <span class="picker-type">{{ location.type }}</span>
+                    <ul id="picker-list" class="picker-list" role="listbox"></ul>
+                </div>
+            </div>
+            <script type="application/json" id="locations-data">{{ locations_json|tojson }}</script>
         </header>
 
-        {% if days %}
+        {% if hero or days %}
         <p class="updated">Forecast saved on {{ fetched_date }}</p>
+
+        {% if hero %}
+        <section class="hero hero--{{ hero.summary.kind }}">
+            <div class="glow glow-a"></div>
+            <div class="glow glow-b"></div>
+
+            <div class="hero-main">
+                <div class="hero-text">
+                    <p class="hero-eyebrow">Today · {{ hero.label }} · {{ location.name }}</p>
+                    <p class="hero-temp">
+                        <span class="count" data-value="{{ hero.max_temp }}">{{ hero.max_temp }}</span><span
+                            class="deg">°C</span>
+                    </p>
+                    <p class="hero-low">Low <span class="count" data-value="{{ hero.min_temp }}">{{ hero.min_temp
+                            }}</span>°</p>
+                    <p class="hero-headline">{{ hero.summary.english }}</p>
+                    <p class="hero-malay">{{ hero.summary_raw }}</p>
+                </div>
+                <div class="hero-icon">
+                    {{ weather_icon(hero.summary.kind, hero.summary.rain_level) }}
+                </div>
+            </div>
+
+            <div class="parts-row">
+                {% for label, part in [("Morning", hero.morning), ("Afternoon", hero.afternoon), ("Night", hero.night)]
+                %}
+                <div class="part">
+                    <p class="part-label">{{ label }}</p>
+                    {{ weather_icon(part.kind, part.rain_level) }}
+                    <p class="part-text">{{ part.english }}</p>
+                    <div class="part-bar" title="Rain extent: {{ part.extent or 'none' }}">
+                        <div class="part-bar-fill" style="width: {{ (part.rain_level or 0) * 25 }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if days %}
+        <h2 class="section-title">Coming days</h2>
         <section class="cards">
             {% for day in days %}
             <article class="card level-{{ day.summary.rain_level }}">
@@ -64,11 +115,13 @@
             </article>
             {% endfor %}
         </section>
+        {% endif %}
         {% else %}
         <p>No forecast stored for this location yet.</p>
         {% endif %}
     </main>
     <script src="/static/anime.umd.min.js"></script>
+    <script src="/static/picker.js"></script>
     <script src="/static/app.js"></script>
 </body>
 
