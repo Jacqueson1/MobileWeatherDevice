@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weather Device · {{ location.name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Weather Device</h1>
+      <p class="sub">MET Malaysia forecast, translated</p>
+      <form method="get" action="/">
+        <label for="location">Location</label>
+        <select id="location" name="location" onchange="this.form.submit()">
+          {% for loc in locations %}
+          <option value="{{ loc.location_id }}"
+                  {% if loc.location_id == location.location_id %}selected{% endif %}>
+            {{ loc.name }} ({{ loc.type }})
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+    </header>
+
+    {% if days %}
+    <p class="updated">Forecast saved on {{ fetched_date }}</p>
+    <section class="cards">
+      {% for day in days %}
+      <article class="card level-{{ day.summary.rain_level }}">
+        <h2>{{ day.title }}</h2>
+        <p class="date">{{ day.label }}</p>
+        <p class="headline">{{ day.summary.english }}</p>
+        <p class="malay">{{ day.summary_raw }}</p>
+        <p class="temp">{{ day.min_temp }}° – {{ day.max_temp }}°C</p>
+        <ul class="parts">
+          <li><span>Morning</span> {{ day.morning.english }}</li>
+          <li><span>Afternoon</span> {{ day.afternoon.english }}</li>
+          <li><span>Night</span> {{ day.night.english }}</li>
+        </ul>
+      </article>
+      {% endfor %}
+    </section>
+    {% else %}
+    <p>No forecast stored for this location yet.</p>
+    {% endif %}
+  </main>
+</body>
+</html>
