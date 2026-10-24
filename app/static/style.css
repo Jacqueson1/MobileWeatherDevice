@@ -33,3 +33,28 @@ select { padding: 8px 10px; font-size: 1rem; border-radius: 8px; border: 1px sol
 .level-2 { border-top-color: #60a5fa; }
 .level-3 { border-top-color: #3b82f6; }
 .level-4 { border-top-color: #1d4ed8; }
+
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+
+/* Icons */
+.icon { width: 64px; height: 64px; display: block; }
+.icon .cloud { fill: #94a3b8; }
+.icon .sun { fill: #f6c744; }
+.icon .rays { transform-box: fill-box; transform-origin: center; }
+.icon .rays line { stroke: #f6c744; stroke-width: 3; stroke-linecap: round; }
+.icon .drop { stroke: #3b82f6; stroke-width: 2.5; stroke-linecap: round; }
+.icon .bolt { fill: #facc15; }
+.icon .haze-line { stroke: #b8a98f; stroke-width: 4; stroke-linecap: round; }
+
+/* Temperature range bar */
+.range { position: relative; height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.range-fill {
+  position: absolute; top: 0; bottom: 0; border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, #f59e0b);
+  transform-origin: left center;
+}
+.range-scale { display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+
+/* Start hidden ONLY when animations are allowed and about to run */
+.animate .card { opacity: 0; }
+.animate .range-fill { transform: scaleX(0); }

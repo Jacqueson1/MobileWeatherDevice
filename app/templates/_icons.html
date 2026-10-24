@@ -1,0 +1,32 @@
+{% macro weather_icon(kind, level) %}
+{% set lvl = level or 0 %}
+<svg class="icon" data-kind="{{ kind }}" data-level="{{ lvl }}" viewBox="0 0 64 64" role="img" aria-label="{{ kind }}">
+  {% if kind == 'none' %}
+    <circle class="sun" cx="32" cy="32" r="11"/>
+    <g class="rays">
+      {% for a in range(0, 360, 45) %}
+      <line x1="32" y1="9" x2="32" y2="16" transform="rotate({{ a }} 32 32)"/>
+      {% endfor %}
+    </g>
+
+  {% elif kind == 'haze' %}
+    <line class="haze-line" x1="14" y1="22" x2="50" y2="22"/>
+    <line class="haze-line" x1="20" y1="33" x2="54" y2="33"/>
+    <line class="haze-line" x1="16" y1="44" x2="46" y2="44"/>
+
+  {% else %}
+    <path class="cloud" d="M20 46 a10 10 0 0 1 0 -20 a14 14 0 0 1 26 -3 a11.5 11.5 0 0 1 2 23 z"/>
+    {% if kind == 'rain' %}
+      {% set n = [2, 2, 3, 5, 7][lvl] %}
+      {% for x in [22, 27, 32, 37, 42, 25, 39][:n] %}
+      <line class="drop" x1="{{ x }}" y1="49" x2="{{ x - 2 }}" y2="56"/>
+      {% endfor %}
+    {% elif kind == 'thunderstorm' %}
+      {% for x in [20, 44, 23, 41][:lvl] %}
+      <line class="drop" x1="{{ x }}" y1="49" x2="{{ x - 2 }}" y2="56"/>
+      {% endfor %}
+      <polygon class="bolt" points="34,42 28,53 33,53 30,62 39,49 34,49 37,42"/>
+    {% endif %}
+  {% endif %}
+</svg>
+{% endmacro %}

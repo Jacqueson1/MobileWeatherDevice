@@ -25,6 +25,14 @@ def day_title(d, today):
         return "Tomorrow"
     return d.strftime("%A")
 
+def temp_bar(min_t, max_t, lo=20, hi=40):
+    """Where the range bar sits, as % of a 20-40°C scale."""
+    if min_t is None or max_t is None:
+        return None, None
+    left = max(0, min(100, (min_t - lo) / (hi - lo) * 100))
+    right = max(0, min(100, (max_t - lo) / (hi - lo) * 100))
+    return round(left, 1), round(max(right - left, 4), 1)
+
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request, location: str = DEFAULT_LOCATION):
@@ -60,10 +68,11 @@ def home(request: Request, location: str = DEFAULT_LOCATION):
     finally:
         conn.close()
 
-    today = datetime.now(MYT).date()
+        today = datetime.now(MYT).date()
     days = []
     for r in rows:
         d = date.fromisoformat(r["forecast_date"])
+        bar_left, bar_width = temp_bar(r["min_temp"], r["max_temp"])   # <-- NEW line
         days.append({
             "title": day_title(d, today),
             "label": d.strftime("%d %b"),
@@ -74,6 +83,8 @@ def home(request: Request, location: str = DEFAULT_LOCATION):
             "night": translate(r["night_forecast"]),
             "min_temp": r["min_temp"],
             "max_temp": r["max_temp"],
+            "bar_left": bar_left,                                      # <-- NEW
+            "bar_width": bar_width,                                    # <-- NEW
         })
 
     return templates.TemplateResponse(request, "index.html", {
