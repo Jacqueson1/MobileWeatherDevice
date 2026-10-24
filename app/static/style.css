@@ -147,3 +147,25 @@ select { padding: 8px 10px; font-size: 1rem; border-radius: 8px; border: 1px sol
 .picker-item.active { background: #e0ecff; }
 .picker-item.current { font-weight: 600; }
 .picker-empty { padding: 12px; color: #64748b; }
+
+/* Keep page content above the rain */
+main { position: relative; z-index: 1; }
+
+/* Ambient rain: a oversized, tilted layer so the streaks fall diagonally */
+.rain-layer {
+  position: fixed; inset: -30%; z-index: 0;
+  pointer-events: none; overflow: hidden;
+  transform: rotate(12deg);
+}
+.raindrop {
+  position: absolute; top: 0; width: 2px; border-radius: 2px;
+  background: linear-gradient(to bottom, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.55));
+  transform: translateY(-120px);   /* parked off-screen until anime.js starts it */
+  will-change: transform;
+}
+
+/* Lightning pulse inside the hero (created by ambient.js) */
+.flash {
+  position: absolute; inset: 0; background: #fff;
+  opacity: 0; pointer-events: none;
+}

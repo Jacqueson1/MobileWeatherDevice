@@ -1,4 +1,5 @@
 {% from "_icons.html" import weather_icon %}
+{% set ambient = hero or (days[0] if days else none) %}
 <!doctype html>
 <html lang="en">
 
@@ -23,7 +24,7 @@
     </script>
 </head>
 
-<body>
+<body{% if ambient %} data-weather="{{ ambient.summary.kind }}" data-level="{{ ambient.summary.rain_level or 0 }}"{% endif %}>
     <main>
         <header>
             <h1>Weather Device</h1>
@@ -123,6 +124,7 @@
     <script src="/static/anime.umd.min.js"></script>
     <script src="/static/picker.js"></script>
     <script src="/static/app.js"></script>
+    <script src="/static/ambient.js"></script>
 </body>
 
 </html>
