@@ -150,7 +150,7 @@ http://127.0.0.1:8000
 
 ## Weather Data Source
 
-This application retrieves weather forecast information from the Malaysian government's public API.
+This application retrieves weather forecast information from the MET Malaysia public API.
 
 **API Endpoint:**
 
