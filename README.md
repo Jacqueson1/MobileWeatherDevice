@@ -7,7 +7,7 @@ A weather dashboard that retrieves weather forecasts from Malaysia's MET API, tr
 
 MobileWeatherDevice is a Python-based weather application designed to make Malaysian weather forecasts easier to understand and access.
 
-The application retrieves weather forecast data from the Malaysian government's public weather API (data.gov.my), stores the retrieved information locally using SQLite, and displays it through a web-based dashboard.
+The application retrieves weather forecast data from the Malaysian government's public weather API (https://mymetdata.met.gov.my/), stores the retrieved information locally using SQLite, and displays it through a web-based dashboard.
 
 Malay weather descriptions are translated into English using a custom rule-based translation module. The dashboard also provides weather icons, temperature information, rain intensity indicators, and animated visual effects.
 
